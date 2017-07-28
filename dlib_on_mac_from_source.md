@@ -48,3 +48,36 @@ Or simply these two steps
 * Error 1 : Build fails
         make[2]: *** No rule to make target `/Users/username/anaconda/lib/libpython3.6.dylib', needed by `dlib.so'. <br>
 Solution: `$ ln -s libpython3.6m.dylib libpython3.6.dylib`
+
+* Error 2: Compilation reaches to the final `[100%] Linking CXX shared library dlib.so` but chokes in the end with bindings with these errors 
+```
+ld: symbol(s) not found for architecture x86_64
+collect2: error: ld returned 1 exit status
+make[2]: *** [dlib.so] Error 1
+make[1]: *** [CMakeFiles/dlib_.dir/all] Error 2
+make: *** [all] Error 2
+error: cmake build failed!
+```
+If you have both Python 2.7 and 3.6 (anaconda in my case) installed, don't do this `brew reinstall boost-python` but this `brew reinstall boost-python --with-python3 --without-python`
+
+The first one still links stuff with Python 2.7 as you can see below
+```
+==> Reinstalling boost-python --with-python3
+==> Using the sandbox
+==> Downloading https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.bz2
+Already downloaded: /Users/tarrysingh/Library/Caches/Homebrew/boost-python-1.64.0.tar.bz2
+==> ./bootstrap.sh --prefix=/usr/local/Cellar/boost-python/1.64.0 --libdir=/usr/local/Cellar/boost-python/1.64.0/lib --with-libraries=python --with-python=python --with-pyth
+==> ./b2 --build-dir=build-python --stagedir=stage-python python=2.7 --prefix=/usr/local/Cellar/boost-python/1.64.0 --libdir=/usr/local/Cellar/boost-python/1.64.0/lib -d2 -j==> ./bootstrap.sh --prefix=/usr/local/Cellar/boost-python/1.64.0 --libdir=/usr/local/Cellar/boost-python/1.64.0/lib --with-libraries=python --with-python=python3 --with-python-root=/usr/local/Cellar/python3/3.6.2/Fr
+==> ./b2 --build-dir=build-python3 --stagedir=stage-python3 python=3.6 --prefix=/usr/local/Cellar/boost-python/1.64.0 --libdir=/usr/local/Cellar/boost-python/1.64.0/lib -d2 -j8 --layout=tagged --user-config=user-conf
+🍺  /usr/local/Cellar/boost-python/1.64.0: 462 files, 28MB, built in 2 minutes 46 seconds
+```
+while the `brew reinstall boost-python --with-python3 --without-python` avoids Python 2.7 all together
+```
+==> Reinstalling boost-python --without-python --with-python3
+==> Using the sandbox
+==> Downloading https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.bz2
+Already downloaded: /Users/tarrysingh/Library/Caches/Homebrew/boost-python-1.64.0.tar.bz2
+==> ./bootstrap.sh --prefix=/usr/local/Cellar/boost-python/1.64.0 --libdir=/usr/local/Cellar/boost-python/1.64.0/lib --with-libraries=python --with-python=python3 --with-python-root=/usr/local/Cellar/python3/3.6.2/Fr
+==> ./b2 --build-dir=build-python3 --stagedir=stage-python3 python=3.6 --prefix=/usr/local/Cellar/boost-python/1.64.0 --libdir=/usr/local/Cellar/boost-python/1.64.0/lib -d2 -j8 --layout=tagged --user-config=user-conf
+🍺  /usr/local/Cellar/boost-python/1.64.0: 454 files, 15.2MB, built in 1 minute 29 seconds
+```
